@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  mysql:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.mysql
+    image: mysql
+    command: mysqld --character-set-server=utf8mb4 --character-set-filesystem=utf8mb4
+    ports:
+      - '33306:3306'
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: sample
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: sample-user
+      MYSQL_PASSWORD: password
+    networks:
+      - sample
+
+  sample_api:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.local
+    image: sample_api
+    ports:
+      - '38080:8080'
+    depends_on:
+      - mysql
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - sample
+
+volumes:
+  sample_mysql:
+
+networks:
+  sample:
