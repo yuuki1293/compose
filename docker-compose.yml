@@ -22,7 +22,7 @@ services:
   sample_api:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile.local
+      dockerfile: ./docker/Dockerfile
     image: sample_api
     ports:
       - '38080:8080'
