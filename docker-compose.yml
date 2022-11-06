@@ -1,40 +1,54 @@
 version: '3'
 
 services:
-  mysql:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile.mysql
-    image: mysql
-    command: mysqld --character-set-server=utf8mb4 --character-set-filesystem=utf8mb4
-    ports:
-      - '33306:3306'
-    volumes:
-      - mysql:/var/lib/mysql
+  db:
+    image: mariadb:10.9.3
     environment:
-      MYSQL_DATABASE: sample
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_USER: sample-user
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sample_db
+      MYSQL_USER: sample_user
       MYSQL_PASSWORD: password
+      TZ: Asia/Tokyo
+    ports:
+      - "3306:3306"
     networks:
       - sample
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
 
-  sample_api:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.0
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      PMA_USER: sample_user
+      PMA_PASSWORD: password
+      TZ: Asia/Tokyo
+    restart: always
+    ports:
+      - "8081:80"
+    networks:
+      - sample
+    depends_on:
+      - db
+
+  web:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-    image: sample_api
     ports:
       - '38080:8080'
     depends_on:
-      - mysql
+      - db
     volumes:
       - .:/usr/src/app
     networks:
       - sample
 
-volumes:
-  sample_mysql:
-
 networks:
   sample:
+
+volumes:
+  db_data:
