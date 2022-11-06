@@ -34,19 +34,6 @@ services:
     depends_on:
       - db
 
-  web:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
-    ports:
-      - '8080:8080'
-    depends_on:
-      - db
-    volumes:
-      - .:/usr/src/app
-    networks:
-      - sample
-
 networks:
   sample:
 
